@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paint_app/screens/category.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+   int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -132,7 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-    
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:paint_app/screens/home_screen.dart';
 import 'package:paint_app/screens/login_screen.dart';
+import 'package:paint_app/screens/signup_screen.dart';
 
 class WrapperState extends StatefulWidget {
   const WrapperState({super.key});
@@ -20,7 +21,7 @@ class _WrapperStateState extends State<WrapperState> {
             if (snapshot.hasData) {
               return HomeScreen();
             } else {
-              return LoginScreen();
+              return SignupScreen();
             }
           }),
     );

@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-import 'package:paint_app/screens/signup_screen.dart';
+import 'package:paint_app/screens/Authentication/signup_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -11,26 +15,44 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController email = TextEditingController();
+  final TextEditingController emailorphoneno = TextEditingController();
   final TextEditingController password = TextEditingController();
 
-  Future<void> login() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email.text.trim(),
-          password: password.text,
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login failed: ${e.toString()}")),
-        );
-      }
+  void Login(String identifier, String password) async {
+  print('Sending identifier="$identifier", password="$password"');
+
+  try {
+    Response response = await post(
+      Uri.parse("https://kkd-backend-api.onrender.com/api/user/login"),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'identifier': identifier, // or 'email'/'phoneNumber' based on your API
+        'password': password,
+      }),
+    );
+
+    print('HTTP status: ${response.statusCode}');
+    print('Server response: ${response.body}');
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 && data['token'] != null) {
+      print("Login Successful, token: ${data['token']}");
+      // Optionally store the token and redirect
+    } else {
+      print("Login failed: ${data['message'] ?? 'Unknown'}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['message'] ?? 'Login failed')),
+      );
     }
+  } catch (e) {
+    print("Exception during login: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
-                        controller: email,
+                        controller: emailorphoneno,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: "Enter your Email",
@@ -142,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: login,
+                          onPressed: () => Login(emailorphoneno.text.toString(), password.text.toString()),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ButtonBackground,
                             padding: const EdgeInsets.symmetric(vertical: 16),

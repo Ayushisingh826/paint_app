@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paint_app/screens/home_screen.dart';
 import 'package:paint_app/screens/product_screen.dart';
-import 'package:paint_app/screens/profile_screen.dart';
-import 'package:paint_app/screens/qr_scan_screen.dart';
+import 'package:paint_app/screens/profile/profile_screen.dart';
+import 'package:paint_app/screens/QrScanner/qr_scan_screen.dart';
 import 'package:paint_app/screens/withdraw.dart';
 
 

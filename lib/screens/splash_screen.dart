@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-import 'package:paint_app/screens/signup_screen.dart';
-import 'package:paint_app/screens/wraper.dart';
+import 'package:paint_app/screens/Authentication/signup_screen.dart';
+import 'package:paint_app/screens/Authentication/wraper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

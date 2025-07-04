@@ -4,12 +4,15 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/filter_screen.dart';
 import 'package:paint_app/screens/home_screen.dart';
-import 'package:paint_app/screens/login_screen.dart';
+import 'package:paint_app/screens/Authentication/login_screen.dart';
 import 'package:paint_app/screens/product_screen.dart';
-import 'package:paint_app/screens/signup_screen.dart';
+import 'package:paint_app/screens/QrScanner/qr_scan_screen.dart';
+import 'package:paint_app/screens/Authentication/signup_screen.dart';
+import 'package:paint_app/screens/profile/profile_screen.dart';
 import 'package:paint_app/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:paint_app/screens/wraper.dart';
+import 'package:paint_app/screens/QrScanner/usedQr_screen.dart';
+import 'package:paint_app/screens/Authentication/wraper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +27,9 @@ void main() async {
             appId: "1:227504674876:web:9562b9ab10acf079504b39"));
   } else {
      await Firebase.initializeApp();
+     
   }
+  
   runApp(MyApp());
 }
 
@@ -36,7 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProductScreen(),
+      home: SignupScreen(),
     );
   }
 }

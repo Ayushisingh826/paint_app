@@ -1,11 +1,15 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:http/http.dart' as http;
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-import 'package:paint_app/screens/login_screen.dart';
-import 'package:paint_app/screens/wraper.dart';
+import 'package:paint_app/screens/Authentication/login_screen.dart';
+import 'package:paint_app/screens/Authentication/wraper.dart';
+import 'package:http/http.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -21,23 +25,45 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
   TextEditingController fullName = TextEditingController();
-  TextEditingController phoneNumber = TextEditingController();
+  TextEditingController phone = TextEditingController();
 
-  Future<void> signup() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text.trim(),
-          password: password.text,
-        );
-        Get.offAll(() => const WrapperState());
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Signup failed: ${e.toString()}")),
-        );
-      }
+ Future<void> SignUp(String fullName, String email, String password, String phoneNumber,String confirmPassword) async {
+  try {
+    final bodyJson = jsonEncode({
+      'fullName': fullName,
+      'phone': phoneNumber,
+      'email': email,
+      'password': password,
+    });
+    print("Request body JSON: $bodyJson");
+
+    final response = await http.post(
+      Uri.parse("https://kkd-backend-api.onrender.com/api/user/signup"),
+      headers: {'Content-Type': 'application/json'},
+      body: bodyJson,
+    );
+
+    print("HTTP status: ${response.statusCode}");
+    print("Raw response: ${response.body}");
+
+    final responseData = jsonDecode(response.body);
+    print("Parsed responseData: $responseData");
+
+    if ((response.statusCode == 200 || response.statusCode == 201)&& responseData["success"] == true) {
+      print("Account created successfully");
+      Get.offAll(() => const WrapperState());
+    } else {
+      print("Signup failed: ${responseData["message"]}");
+      Get.snackbar("Signup Failed", responseData["message"] ?? "Unknown error",
+          backgroundColor: Colors.red, colorText: Colors.white);
     }
+  } catch (e) {
+    print("Exception: $e");
+    Get.snackbar("Error", e.toString(),
+        backgroundColor: Colors.red, colorText: Colors.white);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +140,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Mobile Number
                       _buildLabel("Mobile Number"),
                       TextFormField(
-                        controller: phoneNumber,
+                        controller: phone,
                         keyboardType: TextInputType.phone,
-                        decoration: _inputDecoration("Enter your mobile number"),
+                        decoration:
+                            _inputDecoration("Enter your mobile number"),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Please enter your mobile number";
@@ -167,7 +194,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: signup,
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              final f = fullName.text.trim();
+                              final e = email.text.trim();
+                              final p = password.text.trim();
+                              final ph = phone.text.trim();
+                              final cp = confirmPassword.text.trim();
+
+                              print("Submitting signup:");
+                              print("fullName: '$f'");
+                              print("email: '$e'");
+                              print("password: '$p'");
+                              print("phoneNumber: '$ph'");
+                              print("confirmPassword: '$cp'");
+                              await SignUp(f, e, p, ph, cp);
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ButtonBackground,
                             padding: const EdgeInsets.symmetric(vertical: 16),

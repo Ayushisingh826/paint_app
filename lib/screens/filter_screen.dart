@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 
 class FilterScreen extends StatefulWidget {
@@ -10,113 +9,99 @@ class FilterScreen extends StatefulWidget {
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  // Selected states
-  String selectedCategory = 'Interior';
-  String selectedPrice = '1000';
+  final List<String> categories = ['Interior', 'Exterior', 'Waterproofing', 'Woodfinish'];
+  final List<String> prices = ['1000', '3000', '5000', '8000', '12,000', '15,000', '20,000'];
 
-  // Data
-  final List<String> categories = [
-    'Interior',
-    'Exterior',
-    'Waterproofing',
-    'Woodfinish',
-    'Wallpaper',
-    'Enamel',
-  ];
-
-  final List<String> priceOptions = [
-    '1000',
-    '3000',
-    '5000',
-    '8000',
-    '12,000',
-    '15,000',
-    '20,000',
-  ];
+  String? selectedCategory;
+  String? selectedPrice;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+    
       body: GradientBackground(
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
-                const Center(
-                  child: Text(
-                    "Filter",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+                // Search Bar
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const TextField(
+                          decoration: InputDecoration(
+                            icon: Icon(Icons.search),
+                            hintText: "Search",
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.tune),
+                  ],
                 ),
                 const SizedBox(height: 20),
-
-                // Category Title
-                const Text(
-                  "Category",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        
+                // Product cards
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildProductCard(),
+                    _buildProductCard(),
+                  ],
                 ),
-                const SizedBox(height: 10),
-
-                // Category Chips
+        
+                const SizedBox(height: 24),
+                const Divider(),
+        
+                const Text("Filter", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+        
+                // Category Filter
+                _buildSectionTitle("Category"),
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: categories.map((category) {
-                    return ChoiceChip(
-                      label: Text(category),
-                      selected: selectedCategory == category,
-                      selectedColor: Colors.black,
-                      backgroundColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: selectedCategory == category
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                      onSelected: (_) {
-                        setState(() {
-                          selectedCategory = category;
-                        });
-                      },
-                    );
-                  }).toList(),
+                  spacing: 8,
+                  children: categories.map((cat) => ChoiceChip(
+                    label: Text(cat),
+                    selected: selectedCategory == cat,
+                    onSelected: (_) => setState(() => selectedCategory = cat),
+                    selectedColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    labelStyle: TextStyle(
+                      color: selectedCategory == cat ? Colors.white : Colors.black,
+                    ),
+                  )).toList(),
                 ),
-                const SizedBox(height: 30),
-
-                // Price Title
-                const Text(
-                  "Price",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 10),
-
-                // Price Chips
+        
+                const SizedBox(height: 20),
+        
+                // Price Filter
+                _buildSectionTitle("Price"),
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: priceOptions.map((price) {
-                    return ChoiceChip(
-                      label: Text(price),
-                      selected: selectedPrice == price,
-                      selectedColor: Colors.black,
-                      backgroundColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: selectedPrice == price
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                      onSelected: (_) {
-                        setState(() {
-                          selectedPrice = price;
-                        });
-                      },
-                    );
-                  }).toList(),
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: prices.map((price) => ChoiceChip(
+                    label: Text(price),
+                    selected: selectedPrice == price,
+                    onSelected: (_) => setState(() => selectedPrice = price),
+                    selectedColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    labelStyle: TextStyle(
+                      color: selectedPrice == price ? Colors.white : Colors.black,
+                    ),
+                  )).toList(),
                 ),
-                const SizedBox(height: 40),
-
+        
+                const SizedBox(height: 24),
+        
                 // Buttons
                 Row(
                   children: [
@@ -124,39 +109,84 @@ class _FilterScreenState extends State<FilterScreen> {
                       child: OutlinedButton(
                         onPressed: () {
                           setState(() {
-                            selectedCategory = '';
-                            selectedPrice = '';
+                            selectedCategory = null;
+                            selectedPrice = null;
                           });
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.black),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
-                          "Clean",
-                          style: TextStyle(color: Colors.black),
-                        ),
+                        child: const Text("Clean"),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // Apply logic here
+                          // Apply filter logic here
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text("Apply Changes"),
+                        child: const Text("Apply Changes", style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 120),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) => Align(
+        alignment: Alignment.centerLeft,
+        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      );
+
+  Widget _buildProductCard() {
+    return Container(
+      width: 140,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              Image.asset('assets/images/paint.png', height: 100, fit: BoxFit.cover), // Replace with your image
+              Container(
+                margin: const EdgeInsets.all(4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.monetization_on, size: 14, color: Colors.white),
+                    SizedBox(width: 2),
+                    Text('500', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Birla Opus Style Perfect Start Primer',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const Text('944353', style: TextStyle(fontSize: 12)),
+        ],
       ),
     );
   }

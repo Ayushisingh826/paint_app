@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/Authentication/login_screen.dart';
 import 'package:paint_app/screens/Authentication/wraper.dart';
 import 'package:http/http.dart';
+import 'package:paint_app/screens/home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -50,8 +52,11 @@ class _SignupScreenState extends State<SignupScreen> {
     print("Parsed responseData: $responseData");
 
     if ((response.statusCode == 200 || response.statusCode == 201)&& responseData["success"] == true) {
-      print("Account created successfully");
-      Get.offAll(() => const WrapperState());
+       Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const BottomNavBarScreen()), 
+      );
+      // Get.offAll(() => const WrapperState());
     } else {
       print("Signup failed: ${responseData["message"]}");
       Get.snackbar("Signup Failed", responseData["message"] ?? "Unknown error",

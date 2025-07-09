@@ -4,9 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/Authentication/signup_screen.dart';
+import 'package:paint_app/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,7 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final data = jsonDecode(response.body);
     if (response.statusCode == 200 && data['token'] != null) {
-      print("Login Successful, token: ${data['token']}");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const BottomNavBarScreen()), // 🔁 Change if your home screen requires parameters
+      );
       // Optionally store the token and redirect
     } else {
       print("Login failed: ${data['message'] ?? 'Unknown'}");

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/home_screen.dart';
 import 'package:paint_app/screens/product_screen.dart';
 import 'package:paint_app/screens/profile/profile_screen.dart';
 import 'package:paint_app/screens/QrScanner/qr_scan_screen.dart';
+import 'package:paint_app/screens/reward_detail_screen.dart';
+import 'package:paint_app/screens/reward_screen.dart';
+import 'package:paint_app/screens/wallet_screen.dart';
 import 'package:paint_app/screens/withdraw.dart';
 
 
@@ -23,6 +27,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     QrScanScreen(),
     WithdrawScreen(),
     ProfileScreen(),
+    WalletScreen(),
+    RewardScreen(),
+    RewardDetailsScreen()
   ];
 
   void onTapped(int index) {
@@ -33,21 +40,21 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[selectedIndex], // <-- show selected screen
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
+    return Scaffold(backgroundColor: AppColors.background2,
+      body: _screens[selectedIndex], 
+      bottomNavigationBar: BottomNavigationBar(fixedColor:null,
+     currentIndex: selectedIndex,
         onTap: onTapped,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: "Home"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.production_quantity_limits), label: "Product"),
+              icon: Icon(Icons.production_quantity_limits_sharp), label: "Product"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.qr_code_scanner), label: "QR Scan"),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: "Withdraw"),
+              icon: Icon(Icons.qr_code_outlined), label: "QR Scan"),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_outlined), label: "Withdraw"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),

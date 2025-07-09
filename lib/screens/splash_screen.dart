@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/Authentication/signup_screen.dart';
-import 'package:paint_app/screens/Authentication/wraper.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WrapperState()),
+        MaterialPageRoute(builder: (_) => SignupScreen()),
       );
     });
   }

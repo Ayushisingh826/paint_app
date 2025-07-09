@@ -1,89 +1,126 @@
-import 'dart:convert';
-import 'package:get/get_state_manager/src/rx_flutter/rx_notifier.dart';
-import 'package:http/http.dart'as http;
 import 'package:flutter/material.dart';
-import 'package:paint_app/models/user_model.dart';
+import 'package:paint_app/screens/gradient_background.dart';
 
-
-class ProductScreen extends StatefulWidget {
+class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key});
-
-  @override
-  State<ProductScreen> createState() => _ProductScreenState();
-}
-
-class _ProductScreenState extends State<ProductScreen> {
-  List<UserModel> userList=[];
-  Future<List<UserModel>> getUserApi()async{
-    final response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/users"));
-    var data =jsonDecode(response.body.toString());
-    if(response.statusCode==200){
-    for(Map i in data){
-      print(i['name']);
-      userList.add(UserModel.fromJson(i));
-    }
-
-      return userList;
-    }else{
-      return userList;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("api"),
-      ),
-      body: Column(
-        children: [
-        Expanded(
-          child: FutureBuilder(future: getUserApi(), builder: (context, AsyncSnapshot<List<UserModel>> snapshot){
-            if(!snapshot.hasData){
-              return CircularProgressIndicator();
-            }
-            else {
-              return ListView.builder(
-                  itemCount: userList.length, itemBuilder: (context, index) {
-                return Card(child: Column(
+      body: GradientBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(
+              children: [const SizedBox(height: 50),
+                // 🔍 Search bar
+                Row(
                   children: [
-                    ReusableRow(title: 'Name', value: snapshot.data![index].name.toString()),
-                    ReusableRow(title: 'Email', value: snapshot.data![index].email.toString()),
-                    ReusableRow(title: 'username', value: snapshot.data![index].username.toString()),
-                    ReusableRow(title: 'Address', value: snapshot.data![index].address!.city.toString()),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search',
+                          filled: true,
+                          fillColor: Colors.white,
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(Icons.tune), // Filter icon
+                    ),
                   ],
+                ),
+                const SizedBox(height: 12),
 
-                ),);
-              });
-            }
-          }),
-        )
-        ],
+                // 🪣 Product Grid
+                Expanded(
+                  child: GridView.builder(
+                    itemCount: 6,
+                    padding: const EdgeInsets.only(bottom: 16),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemBuilder: (context, index) {
+                      return const ProductCard();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 }
-// reusable row widget
-class ReusableRow extends StatefulWidget {
-  final String title,value;
-  const ReusableRow({Key? key, required this.title, required this.value}) : super(key: key);
-  @override
-  State<ReusableRow> createState() => _ReusableRowState();
-}
 
-class _ReusableRowState extends State<ReusableRow> {
+class ProductCard extends StatelessWidget {
+  const ProductCard({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Column(
         children: [
-          Text(widget.title),
-          Text(widget.value),
+          Stack(
+            children: [
+              Image.asset(
+                'assets/images/paint.png', // Replace with your image path
+                height: 100,
+                fit: BoxFit.contain,
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.monetization_on, size: 14, color: Colors.white),
+                      SizedBox(width: 2),
+                      Text("500", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Birla Opus Style Perfect Start Primer',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            '944353',
+            style: TextStyle(color: Colors.grey),
+          ),
         ],
       ),
     );
   }
 }
-

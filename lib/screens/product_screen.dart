@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/models/category_model.dart'; // import model
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -20,15 +22,29 @@ class _ProductScreenState extends State<ProductScreen> {
     super.initState();
     fetchCategories();
   }
+Future<void> fetchCategories() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken'); // adjust key if needed
 
-  Future<void> fetchCategories() async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://kkd-backend-api.onrender.com/api/user/get-categories'),
-      );
+    if (token == null) {
+      throw Exception('No token found. Please login again.');
+    }
 
-      if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+    final response = await http.get(
+      Uri.parse('https://kkd-backend-api.onrender.com/api/user/get-categories'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      if (body['success'] == true) {
         final List data = body['data'];
 
         setState(() {
@@ -36,13 +52,25 @@ class _ProductScreenState extends State<ProductScreen> {
           isLoading = false;
         });
       } else {
-        throw Exception('Failed to load categories');
+        throw Exception(body['message'] ?? 'Unknown error from server');
       }
-    } catch (e) {
-      print('Error: $e');
-      setState(() => isLoading = false);
+    } else {
+      throw Exception('Failed to load categories (Code: ${response.statusCode})');
+    }
+  } catch (e) {
+    print('Error: $e');
+    setState(() => isLoading = false);
+
+
+    // Optional: show snackbar
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching categories: $e')),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -37,7 +37,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> loadTokenAndFetchProfile() async {
     final prefs = await SharedPreferences.getInstance();
     jwtToken = prefs.getString('authToken') ?? '';
-    fetchUserProfile();
+    if (jwtToken.isNotEmpty) {
+      await fetchUserProfile();
+    }
   }
 
   Future<void> _logout() async {
@@ -58,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse("https://kkd-backend-api.onrender.com/api/user/profile"),
+        Uri.parse("https://kkd-backend-api.onrender.com/api/user/get-user"),
         headers: {
           'Authorization': 'Bearer $jwtToken',
           'Content-Type': 'application/json',
@@ -67,16 +69,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final user = data['user'];
+        final user = data['data'];
 
         setState(() {
-          _personalDetails["Contact Number"] = user['phone'] ?? '';
-          _personalDetails["Email Id"] = user['email'] ?? '';
-          _personalDetails["Date of Birth"] = user['dob'] ?? '';
-          _personalDetails["Permanent Address"] = user['address'] ?? '';
-          _personalDetails["Pin Code"] = user['pinCode'] ?? '';
-          _personalDetails["State"] = user['state'] ?? '';
-          _personalDetails["Country"] = user['country'] ?? '';
+          _personalDetails["Contact Number"] = user['phone']?.toString() ?? '';
+    _personalDetails["Email Id"] = user['email']?.toString() ?? '';
+    _personalDetails["Date of Birth"] = user['dob']?.toString() ?? '';
+    _personalDetails["Permanent Address"] = user['address']?.toString() ?? '';
+    _personalDetails["Pin Code"] = user['pinCode']?.toString() ?? '';
+    _personalDetails["State"] = user['state']?.toString() ?? '';
+    _personalDetails["Country"] = user['country']?.toString() ?? '';
         });
       } else {
         print("Failed to fetch profile: ${response.body}");
@@ -87,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _editDetail(String key) async {
-    String? result = await showEditDialog(context, key, _personalDetails[key]!);
+    String? result = await showEditDialog(context, key, _personalDetails[key] ?? '');
     if (result != null && result.isNotEmpty) {
       setState(() {
         _personalDetails[key] = result;
@@ -200,20 +202,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
 Future<String?> showEditDialog(
     BuildContext context, String field, String currentValue) {
   TextEditingController controller = TextEditingController(text: currentValue);
+
   return showDialog<String>(
     context: context,
     builder: (context) => AlertDialog(
       title: Text('Edit $field'),
       content: TextField(
-          controller: controller,
-          decoration: InputDecoration(labelText: field)),
+        controller: controller,
+        decoration: InputDecoration(labelText: field),
+      ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel')),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Save')),
+          onPressed: () => Navigator.pop(context, controller.text),
+          child: const Text('Save'),
+        ),
       ],
     ),
   );

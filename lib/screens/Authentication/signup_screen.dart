@@ -12,6 +12,7 @@ import 'package:paint_app/screens/Authentication/login_screen.dart';
 import 'package:paint_app/screens/Authentication/wraper.dart';
 import 'package:http/http.dart';
 import 'package:paint_app/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart' show SharedPreferences;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -29,7 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController fullName = TextEditingController();
   TextEditingController phone = TextEditingController();
 
- Future<void> SignUp(String fullName, String email, String password, String phoneNumber,String confirmPassword) async {
+ Future<void> SignUp(String fullName, String email, String password, String phoneNumber, String confirmPassword) async {
   try {
     final bodyJson = jsonEncode({
       'fullName': fullName,
@@ -37,6 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
       'email': email,
       'password': password,
     });
+
     print("Request body JSON: $bodyJson");
 
     final response = await http.post(
@@ -48,26 +50,38 @@ class _SignupScreenState extends State<SignupScreen> {
     print("HTTP status: ${response.statusCode}");
     print("Raw response: ${response.body}");
 
-    final responseData = jsonDecode(response.body);
-    print("Parsed responseData: $responseData");
+    final data = jsonDecode(response.body);
 
-    if ((response.statusCode == 200 || response.statusCode == 201)&& responseData["success"] == true) {
-       Navigator.pushReplacement(
+    if ((response.statusCode == 200 || response.statusCode == 201) && data["success"] == true) {
+      final user = data['data']['user'];
+      final token = data['token'] ?? ''; // Handle token safely
+
+      final prefs = await SharedPreferences.getInstance();
+      if (token.isNotEmpty) {
+        await prefs.setString('authToken', token); // Save token only if it exists
+      }
+
+      await prefs.setString('userProfile', jsonEncode(user));
+
+      print("✅ Signup success! Navigating to BottomNavBarScreen...");
+
+      // Navigate to home
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const BottomNavBarScreen()), 
+        MaterialPageRoute(builder: (_) => const BottomNavBarScreen()),
       );
-      // Get.offAll(() => const WrapperState());
     } else {
-      print("Signup failed: ${responseData["message"]}");
-      Get.snackbar("Signup Failed", responseData["message"] ?? "Unknown error",
+      print("❌ Signup failed: ${data["message"]}");
+      Get.snackbar("Signup Failed", data["message"] ?? "Unknown error",
           backgroundColor: Colors.red, colorText: Colors.white);
     }
   } catch (e) {
-    print("Exception: $e");
+    print("❌ Exception: $e");
     Get.snackbar("Error", e.toString(),
         backgroundColor: Colors.red, colorText: Colors.white);
   }
 }
+
 
 
   @override

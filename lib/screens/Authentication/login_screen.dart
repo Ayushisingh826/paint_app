@@ -9,6 +9,7 @@ import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/Authentication/signup_screen.dart';
 import 'package:paint_app/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,27 +30,33 @@ class _LoginScreenState extends State<LoginScreen> {
     Response response = await post(
       Uri.parse("https://kkd-backend-api.onrender.com/api/user/login"),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'identifier': identifier, // or 'email'/'phoneNumber' based on your API
+      body: jsonEncode({'identifier': identifier, 
         'password': password,
       }),
     );
 
     print('HTTP status: ${response.statusCode}');
     print('Server response: ${response.body}');
+final data = jsonDecode(response.body);
+print("Login Response: $data");
 
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 && data['token'] != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const BottomNavBarScreen()), // 🔁 Change if your home screen requires parameters
-      );
-      // Optionally store the token and redirect
-    } else {
-      print("Login failed: ${data['message'] ?? 'Unknown'}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'] ?? 'Login failed')),
-      );
-    }
+String? token = data['token'] ?? data['data']?['token'];
+
+if ((response.statusCode == 200 || response.statusCode == 201) && token != null) {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString("authToken", token);
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const BottomNavBarScreen()),
+  );
+} else {
+  print("Login failed or token not found: ${data['message']}");
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(data['message'] ?? 'Login failed')),
+  );
+}
+
   } catch (e) {
     print("Exception during login: $e");
     ScaffoldMessenger.of(context).showSnackBar(

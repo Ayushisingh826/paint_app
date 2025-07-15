@@ -1,8 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:paint_app/screens/colors.dart';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 
 class UploadPassbookScreen extends StatefulWidget {
@@ -14,26 +19,84 @@ class UploadPassbookScreen extends StatefulWidget {
 
 class _UploadPassbookScreenState extends State<UploadPassbookScreen> {
   File? _selectedFile;
+  XFile? _webFile;
+  bool isUploading = false;
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _selectedFile = File(pickedFile.path);
+        if (kIsWeb) {
+          _webFile = pickedFile;
+        } else {
+          _selectedFile = File(pickedFile.path);
+        }
       });
     }
   }
 
-  void _saveFile() {
-    if (_selectedFile != null) {
+  Future<void> _uploadPassbook() async {
+    setState(() {
+      isUploading = true;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('authToken');
+
+      if (token == null) throw Exception("No token found");
+
+      var uri = Uri.parse('https://kkd-backend-api.onrender.com/api/user/upload-passbook');
+      var request = http.MultipartRequest('POST', uri)
+        ..headers['Authorization'] = 'Bearer $token';
+
+      http.MultipartFile multipartFile;
+
+      if (kIsWeb && _webFile != null) {
+        final bytes = await _webFile!.readAsBytes();
+        multipartFile = http.MultipartFile.fromBytes(
+          'passbookPhoto',
+          bytes,
+          filename: _webFile!.name,
+          contentType: MediaType('image', 'jpeg'),
+        );
+      } else if (_selectedFile != null) {
+        multipartFile = await http.MultipartFile.fromPath(
+          'passbookPhoto',
+          _selectedFile!.path,
+          contentType: MediaType('image', 'jpeg'),
+        );
+      } else {
+        throw Exception("No image selected");
+      }
+
+      request.files.add(multipartFile);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print("📦 Raw response body: \${response.body}");
+      print("📦 Status code: \${response.statusCode}");
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Passbook uploaded successfully")),
+        );
+        Navigator.pop(context);
+      } else {
+        throw Exception(data['message'] ?? "Upload failed");
+      }
+    } catch (e) {
+      print("❌ Upload Error: \$e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passbook uploaded successfully")),
+        SnackBar(content: Text("Error: \$e")),
       );
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please upload an image")),
-      );
+    } finally {
+      setState(() {
+        isUploading = false;
+      });
     }
   }
 
@@ -65,14 +128,16 @@ class _UploadPassbookScreenState extends State<UploadPassbookScreen> {
                     border: Border.all(color: Colors.black26),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: _selectedFile != null
+                  child: (_selectedFile != null || _webFile != null)
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
-                            _selectedFile!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
+                          child: kIsWeb
+                              ? Image.network(_webFile!.path)
+                              : Image.file(
+                                  _selectedFile!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
                         )
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -88,14 +153,16 @@ class _UploadPassbookScreenState extends State<UploadPassbookScreen> {
               const Text("Only JPG, PNG, or PDF files. Max size: 5 MB", style: TextStyle(fontSize: 12, color: Colors.black)),
               const Spacer(),
               ElevatedButton(
-                onPressed: _saveFile,
+                onPressed: isUploading ? null : _uploadPassbook,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const Text("Save", style: TextStyle(color: Colors.white)),
-              )
+                child: isUploading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Save", style: TextStyle(color: Colors.white)),
+              ),
             ],
           ),
         ),

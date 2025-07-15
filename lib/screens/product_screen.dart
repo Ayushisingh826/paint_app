@@ -1,8 +1,48 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:paint_app/screens/gradient_background.dart';
+import 'package:paint_app/models/category_model.dart'; // import model
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
+
+  @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  List<CategoryModel> _categories = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://kkd-backend-api.onrender.com/api/user/get-categories'),
+      );
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        final List data = body['data'];
+
+        setState(() {
+          _categories = data.map((e) => CategoryModel.fromJson(e)).toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +52,8 @@ class ProductScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
-              children: [const SizedBox(height: 50),
+              children: [
+                const SizedBox(height: 50),
                 // 🔍 Search bar
                 Row(
                   children: [
@@ -43,21 +84,24 @@ class ProductScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // 🪣 Product Grid
+                // 📦 Category Grid
                 Expanded(
-                  child: GridView.builder(
-                    itemCount: 6,
-                    padding: const EdgeInsets.only(bottom: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemBuilder: (context, index) {
-                      return const ProductCard();
-                    },
-                  ),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : GridView.builder(
+                          itemCount: _categories.length,
+                          padding: const EdgeInsets.only(bottom: 16),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            return ProductCard(category: category);
+                          },
+                        ),
                 ),
               ],
             ),
@@ -69,7 +113,8 @@ class ProductScreen extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key});
+  final CategoryModel category;
+  const ProductCard({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -81,43 +126,22 @@ class ProductCard extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Column(
         children: [
-          Stack(
-            children: [
-              Image.asset(
-                'assets/images/paint.png', // Replace with your image path
-                height: 100,
-                fit: BoxFit.contain,
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.monetization_on, size: 14, color: Colors.white),
-                      SizedBox(width: 2),
-                      Text("500", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          Image.network(
+            category.imageUrl,
+            height: 100,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 100),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Birla Opus Style Perfect Start Primer',
+          Text(
+            category.name,
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '944353',
-            style: TextStyle(color: Colors.grey),
+          Text(
+            category.id,
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),

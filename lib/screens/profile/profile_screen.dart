@@ -6,6 +6,7 @@ import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/profile/bank_details_card.dart';
 import 'package:paint_app/screens/profile/kyc_screen.dart';
 import 'package:paint_app/screens/profile/profile_card.dart';
+import 'package:paint_app/screens/profile/update_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -53,10 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchUserProfile() async {
-    if (jwtToken.isEmpty) {
-      print("JWT token not found!");
-      return;
-    }
+    if (jwtToken.isEmpty) return;
 
     try {
       final response = await http.get(
@@ -73,12 +71,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         setState(() {
           _personalDetails["Contact Number"] = user['phone']?.toString() ?? '';
-    _personalDetails["Email Id"] = user['email']?.toString() ?? '';
-    _personalDetails["Date of Birth"] = user['dob']?.toString() ?? '';
-    _personalDetails["Permanent Address"] = user['address']?.toString() ?? '';
-    _personalDetails["Pin Code"] = user['pinCode']?.toString() ?? '';
-    _personalDetails["State"] = user['state']?.toString() ?? '';
-    _personalDetails["Country"] = user['country']?.toString() ?? '';
+          _personalDetails["Email Id"] = user['email']?.toString() ?? '';
+          _personalDetails["Date of Birth"] = user['dob']?.toString() ?? '';
+          _personalDetails["Permanent Address"] = user['address']?.toString() ?? '';
+          _personalDetails["Pin Code"] = user['pinCode']?.toString() ?? '';
+          _personalDetails["State"] = user['state']?.toString() ?? '';
+          _personalDetails["Country"] = user['country']?.toString() ?? '';
         });
       } else {
         print("Failed to fetch profile: ${response.body}");
@@ -169,6 +167,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontWeight: FontWeight.bold, fontSize: 16)),
                       const Divider(thickness: 1, color: Colors.black),
                       const SizedBox(height: 8),
+
+                      // 🔽 Personal details box
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -177,12 +177,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           border: Border.all(color: Colors.lightBlue),
                         ),
                         child: Column(
-                          children: _personalDetails.entries.map((entry) {
-                            return buildInfoRow(entry.key, entry.value,
-                                () => _editDetail(entry.key));
-                          }).toList(),
+                          children: _personalDetails.entries
+                              .map((entry) => buildInfoRow(
+                                  entry.key,
+                                  entry.value,
+                                  () => _editDetail(entry.key)))
+                              .toList(),
                         ),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      // 🔽 Update Button Component
+                      UpdateProfileButton(personalDetails: _personalDetails),
+
                       const SizedBox(height: 16),
                       const KycCard(),
                       const SizedBox(height: 16),

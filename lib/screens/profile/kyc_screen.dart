@@ -22,93 +22,111 @@ class _KycCardState extends State<KycCard> {
   bool isUploadingPan = false;
   bool isUploadingAadhar = false;
 
+
   final ImagePicker _picker = ImagePicker();
-
   Future<void> _uploadPanCard() async {
-    setState(() => isUploadingPan = true);
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        await uploadDocument(image, 'panPhoto', 'https://kkd-backend-api.onrender.com/api/user/upload-pan', isPan: true);
-      }
-    } finally {
-      setState(() => isUploadingPan = false);
-    }
-  }
-
-  Future<void> _uploadAadharCard() async {
-    setState(() => isUploadingAadhar = true);
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        await uploadDocument(image, 'aadharPhoto', 'https://kkd-backend-api.onrender.com/api/user/upload-aadhar', isPan: false);
-      }
-    } finally {
-      setState(() => isUploadingAadhar = false);
-    }
-  }
-
-  Future<void> uploadDocument(XFile image, String fieldName, String endpoint, {required bool isPan}) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('authToken');
-
-      if (token == null) throw Exception("No token found");
-
-      var uri = Uri.parse(endpoint);
-      var request = http.MultipartRequest('POST', uri)
-        ..headers['Authorization'] = 'Bearer $token';
-
-      http.MultipartFile multipartFile;
-      if (kIsWeb) {
-        final bytes = await image.readAsBytes();
-        multipartFile = http.MultipartFile.fromBytes(
-          fieldName,
-          bytes,
-          filename: image.name,
-          contentType: MediaType('image', 'jpeg'),
-        );
-      } else {
-        multipartFile = await http.MultipartFile.fromPath(
-          fieldName,
-          image.path,
-          contentType: MediaType('image', 'jpeg'),
-        );
-      }
-
-      request.files.add(multipartFile);
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      print("📦 Raw response body: ${response.body}");
-      print("📦 Status code: ${response.statusCode}");
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("✅ ${isPan ? 'PAN' : 'Aadhar'} uploaded successfully")),
-        );
-
-        setState(() {
-          if (isPan) {
-            panPhotoUrl = data['data']['panPhoto'];
-            isPanVerified = data['data']['isPanVerified'];
-          } else {
-            aadharPhotoUrl = data['data']['aadharPhoto'];
-            isAadharVerified = data['data']['isAadharVerified'];
-          }
-        });
-      } else {
-        throw Exception(data['message'] ?? "Upload failed");
-      }
-    } catch (e) {
-      print("❌ Upload Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+  setState(() => isUploadingPan = true);
+  try {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      await uploadDocument(
+        image,
+        'panPhoto',
+        'https://kkd-backend-api.onrender.com/api/user/upload-pan',
+        isPan: true,
       );
     }
+  } finally {
+    setState(() => isUploadingPan = false);
   }
+}
+
+Future<void> _uploadAadharCard() async {
+  setState(() => isUploadingAadhar = true);
+  try {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      await uploadDocument(
+        image,
+        'aadharPhoto',
+        'https://kkd-backend-api.onrender.com/api/user/upload-aadhar',
+        isPan: false,
+      );
+    }
+  } finally {
+    setState(() => isUploadingAadhar = false);
+  }
+}
+
+
+  Future<void> uploadDocument(XFile image, String fieldName, String endpoint, {required bool isPan}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+
+    if (token == null) throw Exception("No token found");
+
+    var uri = Uri.parse(endpoint);
+    var request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $token';
+
+    http.MultipartFile multipartFile;
+    if (kIsWeb) {
+      final bytes = await image.readAsBytes();
+      multipartFile = http.MultipartFile.fromBytes(
+        fieldName,
+        bytes,
+        filename: image.name,
+        contentType: MediaType('image', 'jpeg'),
+      );
+    } else {
+      multipartFile = await http.MultipartFile.fromPath(
+        fieldName,
+        image.path,
+        contentType: MediaType('image', 'jpeg'),
+      );
+    }
+
+    request.files.add(multipartFile);
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    print("📦 Raw response body: ${response.body}");
+    print("📦 Status code: ${response.statusCode}");
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['success'] == true) {
+      final responseData = data['data'];
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("✅ ${isPan ? 'PAN' : 'Aadhar'} uploaded successfully")),
+      );
+
+      setState(() {
+        if (isPan) {
+          panPhotoUrl = responseData['panPhoto'];
+          isPanVerified = responseData['panVerificationStatus'] == 'verified';
+        } else {
+          aadharPhotoUrl = responseData['aadharPhoto'];
+          isAadharVerified = responseData['aadharVerificationStatus'] == 'verified';
+        }
+
+        // Optional: handle kycRequestCreated
+        final kycRequestCreated = data['kycRequestCreated'] ?? false;
+        print("KYC Request Created: $kycRequestCreated");
+      });
+    } else {
+      throw Exception(data['message'] ?? "Upload failed");
+    }
+  } catch (e) {
+    print("❌ Upload Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: $e")),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -177,3 +195,4 @@ class _KycCardState extends State<KycCard> {
     );
   }
 }
+

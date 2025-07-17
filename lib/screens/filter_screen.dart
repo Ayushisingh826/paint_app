@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/gradient_background.dart';
+import 'package:paint_app/screens/product_screen.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({super.key});
@@ -9,8 +12,21 @@ class FilterScreen extends StatefulWidget {
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  final List<String> categories = ['Interior', 'Exterior', 'Waterproofing', 'Woodfinish'];
-  final List<String> prices = ['1000', '3000', '5000', '8000', '12,000', '15,000', '20,000'];
+  final List<String> categories = [
+    'Interior',
+    'Exterior',
+    'Waterproofing',
+    'Woodfinish'
+  ];
+  final List<String> prices = [
+    '1000',
+    '3000',
+    '5000',
+    '8000',
+    '12,000',
+    '15,000',
+    '20,000'
+  ];
 
   String? selectedCategory;
   String? selectedPrice;
@@ -18,7 +34,6 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
       body: GradientBackground(
         child: SafeArea(
           child: SingleChildScrollView(
@@ -45,11 +60,27 @@ class _FilterScreenState extends State<FilterScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Icon(Icons.tune),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BottomNavBarScreen()),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.tune),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
-        
+
                 // Product cards
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -58,50 +89,62 @@ class _FilterScreenState extends State<FilterScreen> {
                     _buildProductCard(),
                   ],
                 ),
-        
+
                 const SizedBox(height: 24),
                 const Divider(),
-        
-                const Text("Filter", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+                const Text("Filter",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-        
+
                 // Category Filter
                 _buildSectionTitle("Category"),
                 Wrap(
                   spacing: 8,
-                  children: categories.map((cat) => ChoiceChip(
-                    label: Text(cat),
-                    selected: selectedCategory == cat,
-                    onSelected: (_) => setState(() => selectedCategory = cat),
-                    selectedColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: selectedCategory == cat ? Colors.white : Colors.black,
-                    ),
-                  )).toList(),
+                  children: categories
+                      .map((cat) => ChoiceChip(
+                            label: Text(cat),
+                            selected: selectedCategory == cat,
+                            onSelected: (_) =>
+                                setState(() => selectedCategory = cat),
+                            selectedColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            labelStyle: TextStyle(
+                              color: selectedCategory == cat
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ))
+                      .toList(),
                 ),
-        
+
                 const SizedBox(height: 20),
-        
+
                 // Price Filter
                 _buildSectionTitle("Price"),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: prices.map((price) => ChoiceChip(
-                    label: Text(price),
-                    selected: selectedPrice == price,
-                    onSelected: (_) => setState(() => selectedPrice = price),
-                    selectedColor: Colors.black,
-                    backgroundColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: selectedPrice == price ? Colors.white : Colors.black,
-                    ),
-                  )).toList(),
+                  children: prices
+                      .map((price) => ChoiceChip(
+                            label: Text(price),
+                            selected: selectedPrice == price,
+                            onSelected: (_) =>
+                                setState(() => selectedPrice = price),
+                            selectedColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            labelStyle: TextStyle(
+                              color: selectedPrice == price
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ))
+                      .toList(),
                 ),
-        
+
                 const SizedBox(height: 24),
-        
+
                 // Buttons
                 Row(
                   children: [
@@ -128,7 +171,8 @@ class _FilterScreenState extends State<FilterScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                         ),
-                        child: const Text("Apply Changes", style: TextStyle(color: Colors.white)),
+                        child: const Text("Apply Changes",
+                            style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ],
@@ -160,7 +204,8 @@ class _FilterScreenState extends State<FilterScreen> {
           Stack(
             alignment: Alignment.topRight,
             children: [
-              Image.asset('assets/images/paint.png', height: 100, fit: BoxFit.cover), // Replace with your image
+              Image.asset('assets/images/paint.png',
+                  height: 100, fit: BoxFit.cover), // Replace with your image
               Container(
                 margin: const EdgeInsets.all(4),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -173,7 +218,8 @@ class _FilterScreenState extends State<FilterScreen> {
                   children: const [
                     Icon(Icons.monetization_on, size: 14, color: Colors.white),
                     SizedBox(width: 2),
-                    Text('500', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    Text('500',
+                        style: TextStyle(color: Colors.white, fontSize: 12)),
                   ],
                 ),
               ),

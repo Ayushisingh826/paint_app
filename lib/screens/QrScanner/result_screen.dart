@@ -1,19 +1,30 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class ResultScreen extends StatelessWidget {
+  final VoidCallback closeScreen;
+  final String code;
+
   const ResultScreen({
     super.key,
-    required this.code,
     required this.closeScreen,
+    required this.code,
   });
-
-  final String code;
-  final Function() closeScreen;
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> decoded = jsonDecode(code);
+
+    final String productId = decoded['productId'] ?? 'N/A';
+    final String type = decoded['type'] ?? 'N/A';
+    final String hash = decoded['hash'] ?? 'N/A';
+    final int timestamp = decoded['timestamp'] ?? 0;
+
+    // Optional reward (you can parse this from the API too if returned)
+    final int coinsEarned = decoded['coinsEarned'] ?? 5000; // fallback
+
     return Scaffold(
-      backgroundColor: Colors.black87, 
+      backgroundColor: Colors.black87,
       body: Center(
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 30),
@@ -24,29 +35,26 @@ class ResultScreen extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Main Content
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
                   const Text(
-                    'Congratulations',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    '🎉 Congratulations!',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   Image.asset(
-                    'assets/images/coin.png', // replace with your coin image
+                    'assets/images/coin.png',
                     height: 70,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    '5,000 coins',
-                    style: TextStyle(
+                  Text(
+                    '$coinsEarned coins',
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
+                      color: Colors.green,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -54,11 +62,29 @@ class ResultScreen extends StatelessWidget {
                     'have been added to your Wallet.',
                     style: TextStyle(fontSize: 14),
                   ),
-                  const SizedBox(height: 20),
+                  const Divider(height: 30, thickness: 1),
+                  const Text(
+                    'Product Scan Details',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("🆔 Product ID: $productId"),
+                        Text("📦 Type: $type"),
+                        Text("🕒 Time: $timestamp"),
+                        Text("🔑 Hash: $hash"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
 
-              // Close button (top-right)
+              // Close Button (top-right)
               Positioned(
                 right: 0,
                 top: 0,

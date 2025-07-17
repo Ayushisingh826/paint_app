@@ -17,21 +17,6 @@ import 'package:paint_app/screens/Authentication/wraper.dart';
 import 'package:paint_app/screens/withdraw.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-        options: FirebaseOptions(
-            apiKey: "AIzaSyBTh2EupMYmr3c6Qzyp-DyZuLNWnapsBe4",
-            authDomain: "paintapp-9f031.firebaseapp.com",
-            projectId: "paintapp-9f031",
-            storageBucket: "paintapp-9f031.firebasestorage.app",
-            messagingSenderId: "227504674876",
-            appId: "1:227504674876:web:9562b9ab10acf079504b39"));
-  } else {
-     await Firebase.initializeApp();
-     
-  }
-  
   runApp(MyApp());
 }
 

@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:http/http.dart' as http;
+import 'package:paint_app/screens/QrScanner/usedQr_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:paint_app/screens/QrScanner/result_screen.dart';
 
 class QrScanScreen extends StatefulWidget {
@@ -11,9 +15,80 @@ class QrScanScreen extends StatefulWidget {
 
 class _QrScanScreenState extends State<QrScanScreen> {
   bool isScanCompleted = false;
+  final MobileScannerController controller = MobileScannerController();
 
   void closeScreen() {
     isScanCompleted = false;
+  }
+
+  Future<void> handleQRScan(String qrData) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('authToken');
+    if (token == null) throw Exception("No token found");
+
+    // Try decoding first to validate it's a valid JSON
+    late String encodedQrData;
+    try {
+      final decoded = jsonDecode(qrData); // this will throw if not valid
+      encodedQrData = jsonEncode(decoded); // ensures it's properly encoded
+    } catch (_) {
+      throw Exception("Invalid QR code format.");
+    }
+
+    final uri = Uri.parse('https://kkd-backend-api.onrender.com/api/user/scan-qr');
+    final body = jsonEncode({'qrData': encodedQrData});
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.post(uri, body: body, headers: headers);
+
+    print("🔍 API Status: ${response.statusCode}");
+    print("📦 Response: ${response.body}");
+
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && responseData['success'] == true) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            closeScreen: closeScreen,
+            code: jsonEncode(responseData['data']),
+          ),
+        ),
+      );
+    } else if (response.statusCode == 400 &&
+        responseData['message'] == "QR code already used") {
+      final usedBy = responseData['data']?['usedBy'] ?? 'Unknown';
+      final usedOn = responseData['data']?['usedOn'] ?? 'Unknown';
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UsedQrScreen(
+            name: usedBy,
+            date: usedOn,
+            closeScreen: closeScreen,
+          ),
+        ),
+      );
+    } else {
+      throw Exception(responseData['message'] ?? 'QR scan failed');
+    }
+  } catch (e) {
+    print("❌ QR Scan Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+  }
+}
+
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -22,26 +97,19 @@ class _QrScanScreenState extends State<QrScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // QR Scanner
           MobileScanner(
-            onDetect: (barcodeCapture) {
+            controller: controller,
+            onDetect: (barcodeCapture) async {
               if (!isScanCompleted && barcodeCapture.barcodes.isNotEmpty) {
-                String code = barcodeCapture.barcodes.first.rawValue ?? '---';
+                final code = barcodeCapture.barcodes.first.rawValue ?? '';
                 isScanCompleted = true;
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultScreen(
-                      closeScreen: closeScreen,
-                      code: code,
-                    ),
-                  ),
-                );
+                await controller.stop(); // ✅ Stop camera to prevent warnings
+                await handleQRScan(code);
               }
             },
           ),
 
-          // Top Bar
+          // ❌ Close Button
           Positioned(
             top: 50,
             left: 20,
@@ -51,21 +119,17 @@ class _QrScanScreenState extends State<QrScanScreen> {
             ),
           ),
 
-          // Scan Frame (Custom Corner Brackets)
+          // ✅ Border Frame
           Center(
             child: Container(
               width: 250,
               height: 250,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
-              ),
-              child: CustomPaint(
-                painter: ScanBorderPainter(),
-              ),
+              decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
+              child: CustomPaint(painter: ScanBorderPainter()),
             ),
           ),
 
-          // Bottom Icons
+          // ⚡ Flash / Gallery Placeholder Icons
           Positioned(
             bottom: 60,
             left: 0,
@@ -85,7 +149,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
   }
 }
 
-// Custom Painter for brackets
+// Custom painter for scanner brackets
 class ScanBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

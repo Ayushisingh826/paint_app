@@ -29,8 +29,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController confirmPassword = TextEditingController();
   TextEditingController fullName = TextEditingController();
   TextEditingController phone = TextEditingController();
-
- Future<void> SignUp(String fullName, String email, String password, String phoneNumber, String confirmPassword) async {
+Future<void> SignUp(String fullName, String email, String password, String phoneNumber, String confirmPassword) async {
   try {
     final bodyJson = jsonEncode({
       'fullName': fullName,
@@ -54,18 +53,53 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if ((response.statusCode == 200 || response.statusCode == 201) && data["success"] == true) {
       final user = data['data']['user'];
-      final token = data['token'] ?? ''; // Handle token safely
+      final token = data['token'] ?? '';
 
       final prefs = await SharedPreferences.getInstance();
       if (token.isNotEmpty) {
-        await prefs.setString('authToken', token); // Save token only if it exists
+        await prefs.setString('authToken', token);
       }
 
       await prefs.setString('userProfile', jsonEncode(user));
 
-      print("✅ Signup success! Navigating to BottomNavBarScreen...");
+      print("✅ Signup success! Fetching categories...");
 
-      // Navigate to home
+      // Fetch categories (test immediately after signup)
+      final catResponse = await http.get(
+        Uri.parse('https://kkd-backend-api.onrender.com/api/user/get-categories'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (catResponse.statusCode == 200) {
+        print("📦 Categories fetched successfully after signup.");
+        print(catResponse.body);
+      } else {
+        print("❌ Failed to fetch categories: ${catResponse.statusCode}");
+        print(catResponse.body);
+      }
+
+      // (Optional) Fetch profile from backend if needed
+      final profileResponse = await http.get(
+        Uri.parse('https://kkd-backend-api.onrender.com/api/user/get-profile'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (profileResponse.statusCode == 200) {
+        print("👤 Profile fetched successfully:");
+        print(profileResponse.body);
+        // Optionally store profile again here
+        await prefs.setString('userProfile', profileResponse.body);
+      } else {
+        print("⚠️ Failed to fetch profile: ${profileResponse.statusCode}");
+      }
+
+      // ✅ Navigate to Home
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const BottomNavBarScreen()),
@@ -81,8 +115,6 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: Colors.red, colorText: Colors.white);
   }
 }
-
-
 
   @override
   Widget build(BuildContext context) {

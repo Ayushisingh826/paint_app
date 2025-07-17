@@ -3,6 +3,9 @@ import 'package:paint_app/screens/category.dart';
 import 'package:paint_app/screens/colors.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
+import 'package:paint_app/screens/onboarding_carousel.dart';
+import 'package:paint_app/screens/reward_card.dart';
+import 'package:paint_app/screens/special_gift_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -58,46 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
                                       
-                  // User Card
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.pink.shade100, Colors.purple.shade100],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("TOTAL COINS",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("XXXX XXXX XXXX XXXX\nAAYUSH GUPTA",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16)),
-                            Row(
-                              children: [
-                                const Text("5000",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 5),
-                                Image.asset('assets/images/coin.png', height: 24),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        const Text("View Details",
-                            style: TextStyle(color: Colors.black)),
-                      ],
-                    ),
-                  ),
-                                      
-                  const SizedBox(height: 20),
+                       const RewardCard(),
+               
+                     const SizedBox(height: 30),
                                       
                   // Categories
                   SizedBox(
@@ -107,28 +73,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: const [
                         CategoryItem(
                             name: "Interior",
-                            imagePath: "assets/images/interior.jpg"),
+                            imagePath: "assets/images/interior.png"),
                         CategoryItem(
                             name: "Exterior",
-                            imagePath: "assets/images/exterior.jpg"),
+                            imagePath: "assets/images/exterior.png"),
+                            CategoryItem(
+                            name: "Exterior",
+                            imagePath: "assets/images/waterproof.png"),
+                            CategoryItem(
+                            name: "Exterior",
+                            imagePath: "assets/images/woodfinisher.png"),
                             CategoryItem(
                             name: "Exterior",
                             imagePath: "assets/images/exterior.jpg"),
                             CategoryItem(
                             name: "Exterior",
-                            imagePath: "assets/images/exterior.jpg"),
-                            CategoryItem(
-                            name: "Exterior",
-                            imagePath: "assets/images/exterior.jpg"),
-                            CategoryItem(
-                            name: "Exterior",
-                            imagePath: "assets/images/exterior.jpg"),
+                            imagePath: "assets/images/exterior2.png"),
                       ],
                     ),
                   ),
-                  SizedBox(height: 20,),
-                  Text('Top Product',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,),
-                  SizedBox(height: 10,),
+              const SizedBox(height: 30),
+
+              // 👉 Onboarding carousel
+              const OnboardingCarousel(),
+               const SizedBox(height: 20),
+              const SpecialGiftCard(),
+
                 ],
               ),
             ),

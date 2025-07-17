@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:paint_app/screens/filter_screen.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/models/category_model.dart'; // import model
 import 'package:shared_preferences/shared_preferences.dart';
@@ -100,13 +101,20 @@ Future<void> fetchCategories() async {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.tune), // Filter icon
+                    GestureDetector(onTap: () {
+                       Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FilterScreen()),
+    );
+                    },
+                      child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(Icons.tune), 
+                        ),
                     ),
                   ],
                 ),

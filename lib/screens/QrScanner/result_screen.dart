@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final VoidCallback closeScreen;
@@ -90,8 +91,7 @@ class ResultScreen extends StatelessWidget {
                 top: 0,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
-                    closeScreen();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>BottomNavBarScreen() ));
                   },
                   child: const Icon(Icons.close, size: 20),
                 ),

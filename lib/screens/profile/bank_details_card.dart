@@ -47,7 +47,7 @@ class _BankDetailsCardState extends State<BankDetailsCard> {
         setState(() {
           _bankDetails = {
             "Account Number": data['accountNumber'] ?? "",
-            "Account Holder": data['accountHolderName'] ?? data['name'] ?? "",
+            "Account Holder": data['accountHolderName'] ?? data['fullName'] ?? "",
             "Bank Name": data['bankName'] ?? "",
             "IFSC": data['ifscCode'] ?? "",
             "Passbook": data['passbookUrl'] != null ? "Uploaded" : "Not uploaded",

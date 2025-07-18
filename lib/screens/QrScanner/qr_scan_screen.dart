@@ -20,6 +20,28 @@ class _QrScanScreenState extends State<QrScanScreen> {
   void closeScreen() {
     isScanCompleted = false;
   }
+String formatDate(String isoDate) {
+  try {
+    final dateTime = DateTime.parse(isoDate).toLocal();
+    return "${dateTime.day} ${_monthName(dateTime.month)} ${dateTime.year}, ${_formatTime(dateTime)}";
+  } catch (_) {
+    return isoDate;
+  }
+}
+
+String _monthName(int month) {
+  const months = [
+    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return months[month];
+}
+
+String _formatTime(DateTime dt) {
+  final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;
+  final period = dt.hour >= 12 ? "PM" : "AM";
+  return "${hour}:${dt.minute.toString().padLeft(2, '0')} $period";
+}
 
   Future<void> handleQRScan(String qrData) async {
   try {
@@ -60,21 +82,21 @@ class _QrScanScreenState extends State<QrScanScreen> {
           ),
         ),
       );
-    } else if (response.statusCode == 400 &&
-        responseData['message'] == "QR code already used") {
-      final usedBy = responseData['data']?['usedBy'] ?? 'Unknown';
-      final usedOn = responseData['data']?['usedOn'] ?? 'Unknown';
+    } else if (responseData['message']?.toString().toLowerCase().contains("already been used") ?? false) {
+  final usedBy = responseData['data']?['scannedByName'] ?? 'Unknown';
+  final usedOn = formatDate(responseData['data']?['scannedAt'] ?? '');
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UsedQrScreen(
-            name: usedBy,
-            date: usedOn,
-            closeScreen: closeScreen,
-          ),
-        ),
-      );
+Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => UsedQrScreen(
+        name: usedBy,
+        date: usedOn,
+        closeScreen: closeScreen,
+      ),
+    ),
+  );
+
     } else {
       throw Exception(responseData['message'] ?? 'QR scan failed');
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 
 class UsedQrScreen extends StatelessWidget {
   final String name;
@@ -33,17 +34,17 @@ class UsedQrScreen extends StatelessWidget {
                   const Text(
                     'Oops!',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Icon(Icons.close_rounded,
-                      size: 70, color: Colors.redAccent),
+                  const Icon(Icons.close_outlined,
+                      size: 80, color: Colors.redAccent),
                   const SizedBox(height: 20),
                   Text(
                     "This QR code has already been used by $name on $date.",
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 20),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -54,8 +55,7 @@ class UsedQrScreen extends StatelessWidget {
                 top: 0,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
-                    closeScreen();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>BottomNavBarScreen() ));
                   },
                   child: const Icon(Icons.close, size: 20),
                 ),

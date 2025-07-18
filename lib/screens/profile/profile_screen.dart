@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Positioned(
                 right: 16,
-                top: 8,
+                top: 16,
                 child: IconButton(
                   icon: const Icon(Icons.logout, color: Colors.white),
                   tooltip: 'Logout',
@@ -185,12 +185,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               .toList(),
                         ),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // 🔽 Update Button Component
-                      UpdateProfileButton(personalDetails: _personalDetails),
-
                       const SizedBox(height: 16),
                       const KycCard(),
                       const SizedBox(height: 16),

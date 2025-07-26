@@ -6,6 +6,7 @@ import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/profile/bank_details_card.dart';
 import 'package:paint_app/screens/profile/kyc_screen.dart';
 import 'package:paint_app/screens/profile/profile_card.dart';
+import 'package:paint_app/screens/profile/profile_completion_card.dart';
 import 'package:paint_app/screens/profile/update_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +18,33 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int getCompletedSections() {
+    int completedSections = 0;
+
+    if (_isPersonalDetailsComplete()) completedSections++;
+    if (_isKycComplete()) completedSections++;
+    if (_isBankDetailsComplete()) completedSections++;
+
+    return completedSections;
+  }
+
+  bool _isPersonalDetailsComplete() {
+    // At least 6 of 7 fields filled
+    int filled =
+        _personalDetails.values.where((v) => v.trim().isNotEmpty).length;
+    return filled >= 6;
+  }
+
+  bool _isKycComplete() {
+    
+    return true; 
+  }
+
+  bool _isBankDetailsComplete() {
+  
+    return true; 
+  }
+
   final Map<String, String> _personalDetails = {
     "Contact Number": "",
     "Email Id": "",
@@ -73,7 +101,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _personalDetails["Contact Number"] = user['phone']?.toString() ?? '';
           _personalDetails["Email Id"] = user['email']?.toString() ?? '';
           _personalDetails["Date of Birth"] = user['dob']?.toString() ?? '';
-          _personalDetails["Permanent Address"] = user['address']?.toString() ?? '';
+          _personalDetails["Permanent Address"] =
+              user['address']?.toString() ?? '';
           _personalDetails["Pin Code"] = user['pinCode']?.toString() ?? '';
           _personalDetails["State"] = user['state']?.toString() ?? '';
           _personalDetails["Country"] = user['country']?.toString() ?? '';
@@ -87,7 +116,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _editDetail(String key) async {
-    String? result = await showEditDialog(context, key, _personalDetails[key] ?? '');
+    String? result =
+        await showEditDialog(context, key, _personalDetails[key] ?? '');
     if (result != null && result.isNotEmpty) {
       setState(() {
         _personalDetails[key] = result;
@@ -97,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget buildInfoRow(String label, String value, VoidCallback onEdit) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -141,33 +171,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       const ProfileCard(),
                       const SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEAF3FF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text("Complete your profile",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text("This helps build trust, encouraging members"),
-                            SizedBox(height: 4),
-                            LinearProgressIndicator(value: 0.66),
-                            SizedBox(height: 4),
-                            Text("2 out of 3 complete",
-                                style: TextStyle(color: Colors.teal)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text("Personal details",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
-                      const Divider(thickness: 1, color: Colors.black),
-                      const SizedBox(height: 8),
 
+                      ProfileCompletionCard(
+                          completedSections: getCompletedSections()),
+                      const SizedBox(height: 16),
                       // 🔽 Personal details box
                       Container(
                         padding: const EdgeInsets.all(8),
@@ -177,12 +184,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           border: Border.all(color: Colors.lightBlue),
                         ),
                         child: Column(
-                          children: _personalDetails.entries
-                              .map((entry) => buildInfoRow(
-                                  entry.key,
-                                  entry.value,
-                                  () => _editDetail(entry.key)))
-                              .toList(),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Personal Details",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            const Divider(thickness: 1, color: Colors.black),
+                            ..._personalDetails.entries.map(
+                              (entry) => buildInfoRow(
+                                entry.key,
+                                entry.value,
+                                () => _editDetail(entry.key),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),

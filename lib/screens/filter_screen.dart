@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-import 'package:paint_app/screens/product_screen.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({super.key});
@@ -18,6 +16,7 @@ class _FilterScreenState extends State<FilterScreen> {
     'Waterproofing',
     'Woodfinish'
   ];
+
   final List<String> prices = [
     '1000',
     '3000',
@@ -32,172 +31,194 @@ class _FilterScreenState extends State<FilterScreen> {
   String? selectedPrice;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GradientBackground(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Search Bar
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            icon: Icon(Icons.search),
-                            hintText: "Search",
-                            border: InputBorder.none,
-                          ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: GradientBackground(
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              // Search bar row
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.search),
+                          hintText: "Search",
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const BottomNavBarScreen()),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                  ),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const BottomNavBarScreen(),
                         ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.tune),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(Icons.tune),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Product cards
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildProductCard(),
+                  _buildProductCard(),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Filter Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                      child: Text(
+                        "Filter",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Product cards
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildProductCard(),
-                    _buildProductCard(),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                const Divider(),
-
-                const Text("Filter",
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-
-                // Category Filter
-                _buildSectionTitle("Category"),
-                Wrap(
-                  spacing: 8,
-                  children: categories
-                      .map((cat) => ChoiceChip(
-                            label: Text(cat),
-                            selected: selectedCategory == cat,
-                            onSelected: (_) =>
-                                setState(() => selectedCategory = cat),
-                            selectedColor: Colors.black,
-                            backgroundColor: Colors.white,
-                            labelStyle: TextStyle(
-                              color: selectedCategory == cat
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ))
-                      .toList(),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Price Filter
-                _buildSectionTitle("Price"),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: prices
-                      .map((price) => ChoiceChip(
-                            label: Text(price),
-                            selected: selectedPrice == price,
-                            onSelected: (_) =>
-                                setState(() => selectedPrice = price),
-                            selectedColor: Colors.black,
-                            backgroundColor: Colors.white,
-                            labelStyle: TextStyle(
-                              color: selectedPrice == price
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ))
-                      .toList(),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
+                    const SizedBox(height: 12),
+                    const Divider(thickness: 2, color: Colors.black),
+                    const SizedBox(height: 8),
+                    _buildSectionTitle("Category"),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: categories.map((cat) => ChoiceChip(
+                        label: Text(cat),
+                        selected: selectedCategory == cat,
+                        onSelected: (_) {
                           setState(() {
-                            selectedCategory = null;
-                            selectedPrice = null;
+                            selectedCategory = cat;
                           });
                         },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.black),
+                        selectedColor: Colors.black,
+                        backgroundColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: selectedCategory == cat ? Colors.white : Colors.black,
                         ),
-                        child: const Text("Clean"),
-                      ),
+                      )).toList(),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Apply filter logic here
+                    const SizedBox(height: 20),
+                    _buildSectionTitle("Price"),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: prices.map((price) => ChoiceChip(
+                        label: Text(price),
+                        selected: selectedPrice == price,
+                        onSelected: (_) {
+                          setState(() {
+                            selectedPrice = price;
+                          });
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                        selectedColor: Colors.black,
+                        backgroundColor: Colors.white,
+                        labelStyle: TextStyle(
+                          color: selectedPrice == price ? Colors.white : Colors.black,
                         ),
-                        child: const Text("Apply Changes",
-                            style: TextStyle(color: Colors.white)),
-                      ),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 45),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedCategory = null;
+                                selectedPrice = null;
+                              });
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.black),
+                            ),
+                            child: const Text("Clean"),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // TODO: Apply filter logic
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                            ),
+                            child: const Text(
+                              "Apply Changes",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 120),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   Widget _buildSectionTitle(String title) => Align(
         alignment: Alignment.centerLeft,
-        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
       );
 
   Widget _buildProductCard() {
     return Container(
-      width: 140,
+      width: 164,
+      height: 204,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
@@ -205,7 +226,7 @@ class _FilterScreenState extends State<FilterScreen> {
             alignment: Alignment.topRight,
             children: [
               Image.asset('assets/images/paint.png',
-                  height: 100, fit: BoxFit.cover), // Replace with your image
+                  height: 100, fit: BoxFit.cover),
               Container(
                 margin: const EdgeInsets.all(4),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -236,4 +257,4 @@ class _FilterScreenState extends State<FilterScreen> {
       ),
     );
   }
-}
+} 

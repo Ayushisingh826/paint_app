@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paint_app/screens/bottom_nav_bar_screen.dart';
 import 'package:paint_app/screens/gradient_background.dart';
 import 'package:paint_app/screens/reward_detail_screen.dart';
 
@@ -11,8 +12,7 @@ class RewardScreen extends StatelessWidget {
       body: GradientBackground(
         child: SafeArea(
           child: Column(
-            children: [
-              // 🔙 Top AppBar
+            children: [SizedBox(height: 48),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -28,8 +28,8 @@ class RewardScreen extends StatelessWidget {
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    const Spacer(),
-                    const Icon(Icons.more_vert),
+                    // const Spacer(),
+                    // const Icon(Icons.more_vert),
                   ],
                 ),
               ),
@@ -43,8 +43,8 @@ class RewardScreen extends StatelessWidget {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
                         childAspectRatio: 0.80,
                       ),
                       itemBuilder: (context, index) {
@@ -76,7 +76,7 @@ class OfferCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: Container(width: 164,height: 191,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -89,15 +89,15 @@ class OfferCard extends StatelessWidget {
           ],
         ),
         padding: const EdgeInsets.all(8),
-        child: Column(
+        child: Column(mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(
               child: Image.asset(
                 'assets/images/rewards.png',
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,height: 123,width: 160,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             const Text('Hyundai Creta',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const Text(

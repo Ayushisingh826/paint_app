@@ -239,7 +239,7 @@ Future<void> SignUp(String fullName, String email, String password, String phone
                         },
                       ),
 
-                      const Spacer(),
+                      const SizedBox(height: 140,),
 
                       // Sign Up Button
                       SizedBox(
@@ -265,6 +265,9 @@ Future<void> SignUp(String fullName, String email, String password, String phone
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ButtonBackground,
                             padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                           child: const Text(
                             "Sign Up",
@@ -273,7 +276,7 @@ Future<void> SignUp(String fullName, String email, String password, String phone
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 20),
 
                       // Login Redirect
                       Center(

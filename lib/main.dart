@@ -9,15 +9,18 @@ import 'package:paint_app/screens/product_screen.dart';
 import 'package:paint_app/screens/QrScanner/qr_scan_screen.dart';
 import 'package:paint_app/screens/Authentication/signup_screen.dart';
 import 'package:paint_app/screens/profile/profile_screen.dart';
+import 'package:paint_app/screens/reward_detail_screen.dart';
 import 'package:paint_app/screens/reward_screen.dart';
 import 'package:paint_app/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:paint_app/screens/QrScanner/usedQr_screen.dart';
 import 'package:paint_app/screens/Authentication/wraper.dart';
+import 'package:paint_app/screens/wallet_screen.dart';
 import 'package:paint_app/screens/withdraw.dart';
 
 void main() async {
   runApp(MyApp());
+  
 }
 
 class MyApp extends StatelessWidget {

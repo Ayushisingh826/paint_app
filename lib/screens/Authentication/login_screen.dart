@@ -170,7 +170,7 @@ if ((response.statusCode == 200 || response.statusCode == 201) && token != null)
                         },
                       ),
 
-                      const Spacer(),
+                      const SizedBox(height: 400,),
 
                       // Login Button
                       SizedBox(
@@ -190,7 +190,7 @@ if ((response.statusCode == 200 || response.statusCode == 201) && token != null)
                           ),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 20),
 
                       // Sign Up
                       Center(

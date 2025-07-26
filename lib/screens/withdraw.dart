@@ -78,7 +78,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 // Withdraw form box
               Text(
                         'Your withdrawal request is encrypted and secure.',
-                        style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 14, color: Colors.black,fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 30,),
                 Container(
@@ -86,11 +86,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFE0F2F1), Color(0xFFD1F2EB)],
+                      colors: [Color(0xFFD7E1FD), Color(0xFFD7E4B7)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    border: Border.all(color: Colors.black12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,10 +97,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       const SizedBox(height: 16),
                       const Text(
                         'You can withdraw up to your available balance.',
-                        style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 18),
+                        style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 14),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Amount Withdraw',style: TextStyle(fontSize: 20, color: Colors.black),),
+                      const Text('Amount Withdraw',style: TextStyle(fontSize: 18, color: Colors.black),),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _amountController,
@@ -116,7 +115,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Text('Min: 15,000', style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold)),
+                      const Text('Min: 15,000', style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
 
                       const SizedBox(height: 30),
 
@@ -146,10 +145,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
                 const Spacer(),
 
-                const Text("Need help?"),
+                const Text("Need help?",style: TextStyle(color: Colors.black),
+                  textAlign: TextAlign.center,),
                 const Text(
                   "Contact support at support@birlaopus.com",
-                  style: TextStyle(color: Colors.blueAccent),
+                  style: TextStyle(color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -169,7 +169,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   color: Colors.white,
                   boxShadow: [BoxShadow(blurRadius: 6, color: Colors.black26)],
                 ),
-                child: const Icon(Icons.wallet_giftcard_rounded),
+                child: const Icon(Icons.wallet),
               ),
             ),
           ),

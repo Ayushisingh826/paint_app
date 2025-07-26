@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:paint_app/screens/filter_screen.dart';
 import 'package:paint_app/screens/gradient_background.dart';
-import 'package:paint_app/models/category_model.dart'; // import model
+import 'package:paint_app/models/category_model.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -118,7 +118,7 @@ Future<void> fetchCategories() async {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
                 // 📦 Category Grid
                 Expanded(
@@ -129,8 +129,8 @@ Future<void> fetchCategories() async {
                           padding: const EdgeInsets.only(bottom: 16),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
                             childAspectRatio: 0.75,
                           ),
                           itemBuilder: (context, index) {
@@ -155,29 +155,56 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 160,
+      height: 160,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          )
+        ],
       ),
-      padding: const EdgeInsets.all(8),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Image.network(
-            category.imageUrl,
-            height: 100,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 100),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.network(
+                category.imageUrl,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.broken_image,
+                  size: 80,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             category.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             category.id,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+            ),
           ),
         ],
       ),

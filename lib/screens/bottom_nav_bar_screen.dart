@@ -29,7 +29,8 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     ProfileScreen(),
     WalletScreen(),
     RewardScreen(),
-    RewardDetailsScreen()
+    RewardDetailsScreen(),
+    
   ];
 
   void onTapped(int index) {

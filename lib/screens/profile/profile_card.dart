@@ -20,6 +20,16 @@ class _ProfileCardState extends State<ProfileCard> {
   String? profileUrl;
   File? selectedImage;
   bool isLoading = true;
+final TextEditingController fullNameController = TextEditingController();
+final TextEditingController  dobController = TextEditingController();
+final TextEditingController  addressController = TextEditingController();
+final TextEditingController pinCodeController = TextEditingController();
+final TextEditingController stateController = TextEditingController();
+final TextEditingController countryController = TextEditingController();
+final TextEditingController accountNumberController = TextEditingController();
+final TextEditingController accountHolderController = TextEditingController();
+final TextEditingController bankNameController = TextEditingController();
+final TextEditingController ifscCodeController = TextEditingController();
 
   @override
   void initState() {
@@ -45,7 +55,8 @@ class _ProfileCardState extends State<ProfileCard> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'];
         setState(() {
-          fullName = data['fullName'] ?? 'User';
+          fullName = data['fullName'] ?? data['accountHolderName'];
+          fullNameController.text = fullName;
           role = data['bankName'] ?? 'N/A';
           profileUrl = data['profilePick'];
           isLoading = false;
@@ -135,28 +146,60 @@ class _ProfileCardState extends State<ProfileCard> {
             child: _buildProfileImage(),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  fullName,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                Text(
-                  role,
-                  style: const TextStyle(color: Colors.black54),
-                ),
-              ],
-            ),
-          ),
+         Expanded(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      TextFormField(
+        controller: fullNameController..text = fullName,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          hintText: 'Full Name',
+          isDense: true,
+        ),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+      Text(
+        role,
+        style: const TextStyle(color: Colors.black54),
+      ),
+    ],
+  ),
+),
+
           UpdateProfileButton(
-            personalDetails: {
-              'name': fullName,
-              'role': role,
-            },
-          ),
+  personalDetails: {
+     "fullName": fullNameController.text,
+    "Date of Birth": dobController.text,
+    "Permanent Address": addressController.text,
+    "Pin Code": pinCodeController.text,
+    "State": stateController.text,
+    "Country": countryController.text,
+    "Account Number": accountNumberController.text,
+    "Account Holder Name": accountHolderController.text,
+    "Bank Name": bankNameController.text,
+    "IFSC Code": ifscCodeController.text,
+  },
+  onProfileUpdated: (updatedProfile) {
+    setState(() {
+      fullName = updatedProfile['fullName'] ?? fullName;
+      fullNameController.text = fullName;
+      role = updatedProfile['bankName'] ?? role;
+      profileUrl = updatedProfile['profilePick'] ?? profileUrl;
+      // Update other controllers if needed
+      dobController.text = updatedProfile['Date of Birth'] ?? dobController.text;
+      addressController.text = updatedProfile['Permanent Address'] ?? addressController.text;
+      pinCodeController.text = updatedProfile['Pin Code'] ?? pinCodeController.text;
+      stateController.text = updatedProfile['State'] ?? stateController.text;
+      countryController.text = updatedProfile['Country'] ?? countryController.text;
+      accountNumberController.text = updatedProfile['Account Number'] ?? accountNumberController.text;
+      accountHolderController.text = updatedProfile['Account Holder Name'] ?? accountHolderController.text;
+      bankNameController.text = updatedProfile['Bank Name'] ?? bankNameController.text;
+      ifscCodeController.text = updatedProfile['IFSC Code'] ?? ifscCodeController.text;
+    });
+  },
+)
+
         ],
       ),
     );
